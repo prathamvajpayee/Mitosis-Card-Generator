@@ -398,7 +398,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>MITOSIS CARD GENERATOR 🧬</h1>
+    <h1>CUSTOM CARD GENERATOR</h1>
     
     <div class="app-container">
       <div class="form-container">
@@ -646,8 +646,62 @@
             </div>
           `;
           
+          // Show download button
+          // document.getElementById('downloadBtn').style.display = 'flex';
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        } else {
+          alert('Please select an image for your card.');
+        }
+      });
+      
+      // Download card as image
+      document.getElementById('downloadBtn').addEventListener('click', function() {
+        const card = document.getElementById('pokemonCard');
+        const options = {
+          scale: 3, // Higher scale for better quality
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: null,
+          onclone: function(clonedDoc) {
+            // Ensure all fonts are loaded
+            const style = clonedDoc.createElement('style');
+            style.textContent = `
+              @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap');
+              * {
+                font-smoothing: antialiased;
+                -webkit-font-smoothing: antialiased;
+              }
+            `;
+            clonedDoc.head.appendChild(style);
           }
-        })
+        };
+        
+        // Show loading indicator
+        const btn = this;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        btn.disabled = true;
+        
+        html2canvas(card, options).then(canvas => {
+          // Create higher quality image
+          const link = document.createElement('a');
+          link.download = 'custom-card.png';
+          
+          // Convert to PNG with higher quality
+          canvas.toBlob(function(blob) {
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            
+            // Reset button
+            btn.innerHTML = '<i class="fas fa-download"></i> Download Card';
+            btn.disabled = false;
+          }, 'image/png', 1); // Highest quality
+        });
+      });
+
     });
   </script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
